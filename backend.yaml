@@ -50,7 +50,7 @@
 
     - name: install mysql 
       ansible.builtin.dnf:
-        name: dnf install mysql -y
+        name: mysql
         state: present
 
     # - name: load schema
