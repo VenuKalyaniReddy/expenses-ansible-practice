@@ -23,4 +23,43 @@
         path: /app
         state: directory
 
+    - name: download application
+      ansible.builtin.get_url:
+        url: https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip
+        dest: /tmp/backend.zip
         
+    - name: unarchive the backend application
+      ansible.builtin.unarchive:
+        src: /tmp/backend.zip
+        dest: /app
+        remote_src: yes
+
+    - name: install dependencies
+      ansible.builtin.command: npm install
+
+    - name: copy backend service
+      ansible.builtin.copy:
+        src: backend.service
+        dest: /etc/systemd/system/backend.service
+
+    - name: deamond reload 
+      ansible.builtin.systemd:
+         daemon_reload: true
+
+    - name: install mysql 
+      ansible.builtin.dnf:
+        name: dnf install mysql -y
+        state: present
+
+    - name: load schema
+      ansible.buitlin.command: mysql -h <MYSQL-SERVER-IPADDRESS> -uroot -pExpenseApp@1 < /app/schema/backend.sql
+
+    - name: start and enable catalogue 
+      ansible.builtin.service:
+        name: catalogue
+        enabled: yes
+        state: started 
+
+
+
+
